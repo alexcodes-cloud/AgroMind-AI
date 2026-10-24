@@ -161,12 +161,12 @@ def load_settings(environ: Mapping[str, str] | None = None) -> Settings:
 
     try:
         gemini_timeout_seconds = parse_float("GEMINI_TIMEOUT_SECONDS", "30")
-        gemini_max_output_tokens = parse_int("GEMINI_MAX_OUTPUT_TOKENS", "4096")
+        gemini_max_output_tokens = parse_int("GEMINI_MAX_OUTPUT_TOKENS", "2048")
         gemini_thinking_level = str(values.get("GEMINI_THINKING_LEVEL", "minimal")).strip().lower()
         open_meteo_timeout_seconds = parse_float("OPEN_METEO_TIMEOUT_SECONDS", "10")
         # Keep provider requests small by default. The value remains
         # configurable for deployments with different latency/quota limits.
-        batch_size = parse_int("AGROMIND_BATCH_SIZE", "2")
+        batch_size = parse_int("AGROMIND_BATCH_SIZE", "1")
         analysis_zone_limit = parse_int("AGROMIND_ANALYSIS_ZONE_LIMIT", "0")
         analysis_record_limit = parse_int("AGROMIND_ANALYSIS_RECORD_LIMIT", "0")
         structured_output = parse_bool("GEMINI_STRUCTURED_OUTPUT", "false")
