@@ -16,3 +16,64 @@ button { font: inherit; }
 @layer utilities {
   .text-balance { text-wrap: balance; }
 }
+
+/* AgroMind dashboard dark theme overrides. The theme is toggled on the app root. */
+.dark {
+  color-scheme: dark;
+  background-color: #0b1220;
+  color: #e2e8f0;
+}
+.dark .bg-white { background-color: #111827 !important; }
+.dark .bg-slate-50 { background-color: #0b1220 !important; }
+.dark .bg-slate-100 { background-color: #172033 !important; }
+.dark .bg-slate-200 { background-color: #273449 !important; }
+.dark .text-slate-900 { color: #f8fafc !important; }
+.dark .text-slate-800 { color: #e2e8f0 !important; }
+.dark .text-slate-700 { color: #cbd5e1 !important; }
+.dark .text-slate-600 { color: #cbd5e1 !important; }
+.dark .text-slate-500 { color: #94a3b8 !important; }
+.dark .border-slate-200 { border-color: #334155 !important; }
+.dark .border-slate-100 { border-color: #253247 !important; }
+.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #253247 !important; }
+.dark .hover\:bg-slate-50:hover { background-color: #1e293b !important; }
+.dark .hover\:bg-slate-100:hover { background-color: #334155 !important; }
+.dark nav.bg-slate-50 { background-color: #0f172a !important; }
+.dark input, .dark select, .dark textarea { background-color: #111827; color: #e2e8f0; border-color: #334155; }
+
+/* Progress-led AgroMind loading experience */
+.ag-loading { isolation: isolate; }
+.ag-glow { position: absolute; width: 28rem; height: 28rem; border-radius: 9999px; filter: blur(75px); opacity: .22; }
+.ag-glow-one { top: -10rem; right: -5rem; background: #86efac; }
+.ag-glow-two { bottom: -12rem; left: 20%; background: #bef264; opacity: .14; }
+.dark .ag-glow-one { background: #047857; opacity: .22; }
+.dark .ag-glow-two { background: #365314; opacity: .24; }
+.ag-grid-pattern { position: absolute; inset: 0; opacity: .22; background-image: linear-gradient(to right, rgba(100,116,139,.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(100,116,139,.12) 1px, transparent 1px); background-size: 42px 42px; mask-image: linear-gradient(to bottom, black, transparent 85%); }
+.dark .ag-grid-pattern { opacity: .12; }
+.ag-live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 9999px; background: #10b981; box-shadow: 0 0 0 4px rgba(16,185,129,.12); animation: ag-pulse 1.8s ease-in-out infinite; }
+.ag-progress-fill { position: relative; overflow: hidden; }
+.ag-progress-fill::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.42) 50%, transparent 80%); transform: translateX(-100%); animation: ag-shimmer 1.8s ease-in-out infinite; }
+.ag-step-pulse { animation: ag-float 2s ease-in-out infinite; }
+.ag-orbit-scene { position: relative; width: min(100%, 390px); aspect-ratio: 1; margin-inline: auto; }
+.ag-orbit { position: absolute; inset: 8%; border: 1px solid rgba(16,185,129,.24); border-radius: 50%; }
+.ag-orbit-outer { transform: rotate(-24deg) scaleY(.76); border-style: dashed; animation: ag-rotate 36s linear infinite; }
+.ag-orbit-inner { inset: 19%; transform: rotate(35deg) scaleY(.78); border-color: rgba(132,204,22,.34); }
+.ag-earth { position: absolute; inset: 25%; overflow: hidden; border: 1px solid rgba(16,185,129,.4); border-radius: 50%; background: radial-gradient(circle at 30% 25%, #d9f99d 0%, #86efac 20%, #15803d 60%, #064e3b 100%); box-shadow: 0 0 70px rgba(16,185,129,.18), inset -18px -20px 36px rgba(2,44,34,.35); animation: ag-float 5s ease-in-out infinite; }
+.ag-field-lines { position: absolute; inset: -20%; opacity: .5; transform: rotate(-30deg); background: repeating-linear-gradient(0deg, transparent 0 13px, rgba(236,252,203,.8) 14px 15px, transparent 16px 25px); border-radius: 40%; }
+.ag-field-glow { position: absolute; width: 60%; height: 60%; top: 12%; left: 8%; border-radius: 50%; background: rgba(217,249,157,.3); filter: blur(20px); }
+.ag-sprout { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(255,255,255,.9); font-size: 3rem; text-shadow: 0 0 25px rgba(255,255,255,.4); }
+.ag-float-chip { position: absolute; display: flex; align-items: center; gap: 8px; padding: 10px 13px; border: 1px solid rgba(148,163,184,.22); border-radius: 14px; background: rgba(255,255,255,.86); box-shadow: 0 12px 32px rgba(15,23,42,.08); color: #047857; font-size: 18px; backdrop-filter: blur(12px); animation: ag-float 4.5s ease-in-out infinite; }
+.ag-float-chip span { color: #334155; font-size: 12px; font-weight: 650; white-space: nowrap; }
+.dark .ag-float-chip { background: rgba(15,23,42,.86); border-color: rgba(71,85,105,.6); color: #6ee7b7; box-shadow: 0 12px 32px rgba(0,0,0,.18); }
+.dark .ag-float-chip span { color: #e2e8f0; }
+.ag-chip-one { top: 22%; left: -2%; }
+.ag-chip-two { top: 29%; right: -2%; animation-delay: -.9s; }
+.ag-chip-three { bottom: 20%; left: 4%; animation-delay: -1.7s; }
+.ag-orbit-node { position: absolute; width: 11px; height: 11px; border-radius: 50%; background: #84cc16; border: 3px solid #f7fee7; box-shadow: 0 0 0 5px rgba(132,204,22,.15); }
+.dark .ag-orbit-node { border-color: #1f2937; }
+.ag-node-one { top: 17%; left: 29%; }
+.ag-node-two { bottom: 22%; right: 19%; background: #34d399; }
+@keyframes ag-pulse { 0%, 100% { box-shadow: 0 0 0 4px rgba(16,185,129,.12); } 50% { box-shadow: 0 0 0 7px rgba(16,185,129,.03); } }
+@keyframes ag-shimmer { 100% { transform: translateX(100%); } }
+@keyframes ag-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes ag-rotate { to { transform: rotate(336deg) scaleY(.76); } }
+@media (prefers-reduced-motion: reduce) { .ag-loading *, .ag-loading *::before, .ag-loading *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
