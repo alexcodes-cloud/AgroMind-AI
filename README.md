@@ -1,16 +1,43 @@
-# AgroMind AI
+# AgroMind AI 🌱
+### Smarter farm decisions, zone by zone.
 
-**From field signals to clearer farm decisions.** AgroMind is the decision-support software layer of a larger precision-agriculture project. It helps a farmer spot hydration and fertilization concerns by zone and decide what to check next.
+AgroMind AI helps farmers identify **which farm zones need attention first** by turning soil, crop, and weather data into clear, evidence-based recommendations for hydration and fertilization.
 
-## The problem
+> **Our goal:** help farmers make better-informed decisions, use resources more wisely, and spend less time reviewing scattered data.
 
-Farm decisions depend on signals spread across soil sensors, crop observations, and weather. Reviewing each reading by hand makes it hard to see which zones need attention, especially when data is incomplete or conflicting.
+## 🚜 The problem
 
-## How AI helps
+Farm data can be scattered across soil sensors, crop observations, and weather reports. Comparing every reading manually makes it difficult to spot problems and prioritize the next action.
 
-AI turns those mixed observations into a first-pass assessment for each zone, then summarizes the validated assessments into a prioritized plan. It can connect patterns across many records faster than manual review; without it, a person would need to inspect and compare each zone and signal one by one. The model must cite the input evidence, can report insufficient evidence, and cannot operate farm equipment. A person reviews every recommendation.
+## 💡 Our solution
 
-## The solution
+AgroMind AI analyzes farm zones, checks the evidence, and creates a prioritized farm action plan.
+
+1. **Collect** — combine zone measurements, crop observations, and weather context.
+2. **Analyze** — use AI to assess each zone in manageable batches.
+3. **Validate** — check AI outputs against shared data schemas and source evidence.
+4. **Prioritize** — summarize zone assessments into a farm-wide action plan.
+5. **Review** — explore results and recommendations in an interactive dashboard.
+
+## ✨ What the demo includes
+
+- Zone-level hydration and fertilization insights
+- Evidence-linked AI assessments and prioritized recommendations
+- A farm-wide action plan generated from zone reports
+- Weather context and a dashboard for exploring results
+- Structured output validation and separation of evaluation labels from AI inputs
+
+## 🧠 How it works
+
+```mermaid
+flowchart LR
+    A[Farm data by zone] --> B[Prepare and validate]
+    B --> C[Stage 1: Analyze zones in batches]
+    C --> D[Validate reports and evidence]
+    D --> E[Stage 2: Build farm action plan]
+    E --> F[React dashboard]
+    F --> G[Farmer reviews recommendations]
+```
 
 ```mermaid
 flowchart LR
@@ -21,10 +48,9 @@ flowchart LR
     V --> A1[AI · assess each zone]
     A1 --> A2[AI · prioritize farm actions]
     A2 --> H[Farmer reviews recommendations]
+    
+
 ```
-
-The broader project gathers measurements from sensors placed across farm zones, alongside crop observations and local weather. This repository implements the **software part**: it accepts structured sensor records, analyzes them, and presents evidence-linked recommendations in a dashboard. It does not include sensor hardware or automatically control irrigation or fertilizer systems.
-
 ### What this hackathon demo uses
 
 ```mermaid
@@ -37,21 +63,60 @@ flowchart LR
     R --> P[Farm action plan]
     P --> UI[React dashboard]
 ```
+The two-stage approach keeps zone-level analysis separate from farm-wide prioritization. This helps make recommendations easier to trace and review.
 
-Farm sensor readings in this demo are **synthetic**, not live hardware telemetry. The API serves the included weather snapshot. The analysis uses two AI stages: per-zone assessments, followed by a farm-wide plan. Shared JSON contracts validate outputs, and evidence IDs connect recommendations back to source records. Evaluation labels are kept separate from AI inputs.
+## 🛠️ Tech stack
 
-## Try AgroMind
+- **Frontend:** React
+- **Backend:** FastAPI
+- **AI:** Gemini / Gemma
+- **Data:** Structured JSON contracts, synthetic farm data, and a weather snapshot
 
-**Live demo:** _Vercel link coming soon._
+## ⚠️ Demo limitations
 
-## Project map
+- The included farm measurements are **synthetic**; they are not live sensor readings.
+- The demo uses an included weather snapshot rather than a fully live farm deployment.
+- AI processing can be slow or fail on large requests. The current approach uses smaller batches; future work includes caching, controlled retries, and better progress reporting.
+- Recommendations are for decision support only. A person must review them before acting. The system does **not** directly control pumps, valves, or fertilizer equipment.
 
-| Area | Responsibility |
-| --- | --- |
+## 🚀 What's next?
+
+- Cache unchanged data and previous validated results to reduce repeated AI calls.
+- Add background processing, retries, and clearer analysis progress and data-freshness indicators.
+- Build an AI chat assistant for farm questions and on-demand reports.
+- Store historical data to compare zone conditions over time.
+- Explore safe equipment integration with simulation, strict limits, and human approval before any real-world action.
+
+## 📂 Project structure
+
+| Folder | Purpose |
+|---|---|
 | `front-end/` | React dashboard |
 | `back-end/` | FastAPI, data preparation, weather adapter |
-| `ai/` | Gemini/Gemma prompts, analysis, and validation |
-| `data-set/` | Synthetic farm fixture and offline evaluation labels |
-| `contracts/` | Shared data schemas and example inputs |
+| `ai/` | AI prompts, analysis, and validation |
+| `data-set/` | Synthetic farm fixture and evaluation labels |
+| `contracts/` | Shared schemas and example inputs |
 
-This is a decision-support prototype. Recommendations are informational and require human review.
+## 🌾 The vision
+
+From scattered farm signals to clear priorities — and, in the future, safer precision-agriculture operations.
+
+## 👥 The Team: We are
+<p align="center">
+  <img src="assets/rootsignal.png" alt="RootSignal Team" width="200">
+  <h1 align="center">👥 RootSignal</h1>
+  <p align="center"><i>Every signal matters. Every drop counts.</i></p>
+</p>
+
+<h2 align="center">👥 Meet the Team</h2>
+
+| Member | Responsibilities |
+|:---|:---|
+| **Yassine El Azime** | 📊 Dataset & Weather Data Generation · 🚀 Web App Deployment |
+| **Abdellah Ait Mouhi** | ⚙️ Backend Development · 🧠 AI Pipeline |
+| **Oumaima Naanaa** | ⚙️ Backend Development · 🧠 AI Pipeline |
+| **Safouane Ajdi** | 🎨 Frontend Development · 🖌️ UI/UX Design |
+
+<p align="center">
+  <i>Built with collaboration, powered by AI, designed for smarter agriculture. 🌱</i>
+</p>
