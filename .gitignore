@@ -228,3 +228,5 @@ __marimo__/
 node_modules/
 dist/
 .vite/
+front-end/dist
+front-end/node_modules
