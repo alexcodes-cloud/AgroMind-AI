@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 60,
+      "includeFiles": "**/*.json",
+      "excludeFiles": "{data-set/evaluation_labels.json,back-end/tests/**,**/__pycache__/**,**/*.test.py}"
+    }
+  }
+}
