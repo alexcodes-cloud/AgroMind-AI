@@ -230,3 +230,5 @@ dist/
 .vite/
 front-end/dist
 front-end/node_modules
+front-end/postcss.config.js
+
