@@ -10,10 +10,11 @@ from typing import Any
 from backend.api.config import Settings
 from ai.farm_plan import FarmPlan
 from ai.zone_report import ZoneReport
+from ai.zone_insight import CompactZoneInsights
 
 
 LOGGER = logging.getLogger("agromind.gemini")
-MAX_TRANSIENT_RETRIES = 2
+MAX_TRANSIENT_RETRIES = 1
 TRANSIENT_RETRY_BASE_SECONDS = 0.5
 
 
@@ -216,6 +217,8 @@ class GeminiProvider:
     """Small synchronous adapter that keeps SDK details out of the pipeline."""
 
     def __init__(self, settings: Settings, *, client: Any | None = None):
+        # Stage 1 uses this marker to select the compact hybrid pipeline.
+        self.uses_compact_zone_analysis = True
         self.settings = settings.validate()
         if not self.settings.gemini_api_key:
             if not self.settings.demo_fallback:
@@ -323,10 +326,7 @@ class GeminiProvider:
                 classified = _classify_provider_exception(exc)
                 is_retryable = isinstance(classified, ProviderUpstreamError) or (
                     isinstance(classified, ProviderTimeoutError)
-                    and (
-                        classified.status_code in (408, 504)
-                        or classified.provider_status == "DEADLINE_EXCEEDED"
-                    )
+                    and classified.status_code == 408
                 )
                 if not is_retryable or attempt >= MAX_TRANSIENT_RETRIES:
                     raise classified from exc
@@ -360,6 +360,26 @@ class GeminiProvider:
             raise ProviderMalformedResponseError(
                 f"Gemini returned invalid JSON (response_characters={len(text)})"
             )
+        return payload
+
+    def generate_zone_insights(self, prompt: str) -> dict[str, Any]:
+        """Return only compact interpretations for deterministic report assembly."""
+        try:
+            response = self.generate_content_response(
+                prompt,
+                response_schema=CompactZoneInsights,
+            )
+        except ProviderError:
+            raise
+        except Exception as exc:
+            raise _classify_provider_exception(exc) from exc
+
+        text = _response_text(response)
+        if not isinstance(text, str) or not text.strip():
+            raise ProviderMalformedResponseError("Gemini returned no compact insight response")
+        payload = _parse_json_object(text)
+        if payload is None:
+            raise ProviderMalformedResponseError("Gemini returned invalid compact insight JSON")
         return payload
 
     def generate_farm_plan(self, prompt: str) -> dict[str, Any]:

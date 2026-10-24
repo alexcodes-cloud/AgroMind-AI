@@ -141,7 +141,9 @@ def build_local_zone_report(batch: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def build_local_farm_plan(stage1_result: Any) -> FarmPlan:
+def build_deterministic_farm_plan(
+    stage1_result: Any, *, include_fallback_limitation: bool = False
+) -> FarmPlan:
     """Synthesize validated reports locally, preserving only real evidence IDs."""
     priorities: list[dict[str, Any]] = []
     for batch in stage1_result.batches:
@@ -172,17 +174,27 @@ def build_local_farm_plan(stage1_result: Any) -> FarmPlan:
                         "requires_human_approval": True,
                     }
                 )
+    limitations = []
+    if include_fallback_limitation:
+        limitations.append(FALLBACK_LIMITATION)
+    else:
+        limitations.append("The action plan is a deterministic transformation of validated zone findings.")
     return FarmPlan(
         schema_version="1.0",
         farm_id=stage1_result.farm_id,
         analysis_run_id=stage1_result.analysis_run_id,
         summary=(
-            "Local demo analysis identified items for human review."
+            "Deterministic analysis identified items for human review."
             if priorities
-            else "Local demo analysis found no immediate items requiring review."
+            else "Deterministic analysis found no immediate items requiring review."
         ),
         priorities=priorities,
         farm_wide_considerations=["Review all recommendations with the farm operator."],
         unresolved_questions=[],
-        limitations=[FALLBACK_LIMITATION],
+        limitations=limitations,
     )
+
+
+def build_local_farm_plan(stage1_result: Any) -> FarmPlan:
+    """Build the explicitly labelled offline demo plan."""
+    return build_deterministic_farm_plan(stage1_result, include_fallback_limitation=True)

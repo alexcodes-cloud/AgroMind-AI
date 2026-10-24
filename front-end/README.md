@@ -12,6 +12,10 @@ Copy-Item .env.example .env
 npm run dev
 ```
 
+The development command includes a small supervisor that restarts Vite if it
+exits unexpectedly. The dashboard API client also retries temporary backend
+startup and gateway failures automatically.
+
 Open `http://localhost:5173`.
 
 Start the backend first from the repository root. For a reliable hackathon presentation, run it with:
