@@ -1,131 +1,57 @@
 # AgroMind AI
 
-AgroMind is a hackathon demo that combines synthetic farm sensor data, weather
-context, and Gemini analysis to produce hydration and fertilization guidance.
+**From field signals to clearer farm decisions.** AgroMind is the decision-support software layer of a larger precision-agriculture project. It helps a farmer spot hydration and fertilization concerns by zone and decide what to check next.
 
-## Repository ownership
+## The problem
 
-The code is divided into four working areas. The root `contracts/` directory is
-a shared boundary and should be changed only when the team agrees on a contract
-change.
+Farm decisions depend on signals spread across soil sensors, crop observations, and weather. Reviewing each reading by hand makes it hard to see which zones need attention, especially when data is incomplete or conflicting.
 
-```text
-front-end/   React + TypeScript + Tailwind dashboard
-back-end/    FastAPI routes, configuration, orchestration, and tests
-ai/          Gemini provider, prompts, analyzers, adapters, validators, diagnostics
-data-set/    Synthetic farm generator, farm fixture, and offline evaluation labels
-contracts/   Shared JSON Schemas and example weather snapshot
+## How AI helps
+
+AI turns those mixed observations into a first-pass assessment for each zone, then summarizes the validated assessments into a prioritized plan. It can connect patterns across many records faster than manual review; without it, a person would need to inspect and compare each zone and signal one by one. The model must cite the input evidence, can report insufficient evidence, and cannot operate farm equipment. A person reviews every recommendation.
+
+## The solution
+
+```mermaid
+flowchart LR
+    S[Soil sensors<br/>moisture · nutrients] --> D[Farm data by zone]
+    O[Crop observations] --> D
+    W[Weather context] --> D
+    D --> V[Prepare and validate data]
+    V --> A1[AI · assess each zone]
+    A1 --> A2[AI · prioritize farm actions]
+    A2 --> H[Farmer reviews recommendations]
 ```
 
-The old `agromind-*` directories are no longer used. Deployment configuration
-is kept for later; this refactor does not deploy anything.
+The broader project gathers measurements from sensors placed across farm zones, alongside crop observations and local weather. This repository implements the **software part**: it accepts structured sensor records, analyzes them, and presents evidence-linked recommendations in a dashboard. It does not include sensor hardware or automatically control irrigation or fertilizer systems.
 
-## Install
+### What this hackathon demo uses
 
-From the repository root:
-
-```powershell
-python -m pip install -r requirements-dev.txt
+```mermaid
+flowchart LR
+    F[Synthetic farm fixture] --> B[FastAPI · batch zones]
+    M[Weather snapshot] --> B
+    B --> G[Gemini / Gemma]
+    G --> C[Schema + evidence checks]
+    C --> R[Zone reports]
+    R --> P[Farm action plan]
+    P --> UI[React dashboard]
 ```
 
-Create a local environment file only when needed:
+Farm sensor readings in this demo are **synthetic**, not live hardware telemetry. The API serves the included weather snapshot. The analysis uses two AI stages: per-zone assessments, followed by a farm-wide plan. Shared JSON contracts validate outputs, and evidence IDs connect recommendations back to source records. Evaluation labels are kept separate from AI inputs.
 
-```powershell
-Copy-Item .env.example .env
-```
+## Try AgroMind
 
-Put the real `GEMINI_API_KEY` only in the uncommitted `.env` file. Never commit
-it or print it. Environment variables override `.env` values.
+**Live demo:** _Vercel link coming soon._
 
-## Run the backend
+## Project map
 
-From the repository root:
+| Area | Responsibility |
+| --- | --- |
+| `front-end/` | React dashboard |
+| `back-end/` | FastAPI, data preparation, weather adapter |
+| `ai/` | Gemini/Gemma prompts, analysis, and validation |
+| `data-set/` | Synthetic farm fixture and offline evaluation labels |
+| `contracts/` | Shared data schemas and example inputs |
 
-```powershell
-$env:PYTHONPATH = "$PWD\back-end;$PWD"
-python -m uvicorn backend.api.main:app --app-dir back-end --reload
-```
-
-Useful endpoints:
-
-```text
-GET  /health
-GET  /api/v1/farm
-GET  /api/v1/weather
-POST /api/v1/analysis/zones
-POST /api/v1/analysis/plan
-POST /api/v1/dashboard
-```
-
-The farm and weather endpoints are fixture-backed. AI endpoints use Gemini and
-validate every model response against the shared schemas. For the compact
-low-quota demo, use `AGROMIND_ANALYSIS_ZONE_LIMIT=4` and
-`AGROMIND_ANALYSIS_RECORD_LIMIT=2`. `AGROMIND_DEMO_MODE=true` enables a small
-compatibility adapter for common Gemma output variations; it does not fabricate
-evidence. `AGROMIND_DEMO_FALLBACK=true` is an explicit local fallback for a
-presentation when Gemini is unavailable, and is clearly marked as fallback.
-
-## Run the frontend
-
-In a second terminal:
-
-```powershell
-Set-Location .\front-end
-npm install
-Copy-Item .env.example .env -ErrorAction SilentlyContinue
-npm run dev
-```
-
-Open `http://localhost:5173`. The frontend uses `VITE_API_BASE_URL` from its
-`.env` file and defaults to the local API.
-
-## Test
-
-Backend tests are offline and do not call Gemini:
-
-```powershell
-Set-Location C:\Users\Oblivion\Downloads\AgroSupervisor-AI
-$env:PYTHONPATH = "$PWD\back-end;$PWD"
-python -m unittest discover -s back-end/tests -v
-```
-
-Frontend production build:
-
-```powershell
-Set-Location .\front-end
-npm run build
-```
-
-## AI diagnostics
-
-These scripts are owned by the AI section and never print the API key or full
-prompts:
-
-```powershell
-Set-Location C:\Users\Oblivion\Downloads\AgroSupervisor-AI
-python ai/scripts/diagnose_gemini_stage1.py
-python ai/scripts/diagnose_gemini_stage2.py
-python ai/scripts/list_gemma_models.py
-```
-
-## Dataset and evaluation labels
-
-Regenerate the deterministic compact fixture with:
-
-```powershell
-python data-set/generate_dataset.py --seed 42 --zones 12
-```
-
-`data-set/evaluation_labels.json` is offline-only evaluation data. It is not
-loaded by the batch builder, prompts, API endpoints, or either AI stage.
-
-## Team boundaries
-
-- Frontend consumes `contracts/dashboard-response.schema.json` and calls API endpoints.
-- Backend owns HTTP, configuration, orchestration, and integration tests.
-- AI owns provider calls, prompts, response normalization, and semantic validation.
-- Dataset owns synthetic farm/weather inputs and keeps evaluation labels separate.
-- Contracts are shared and must remain compatible with all four areas.
-
-Recommendations are informational only; the project does not automatically
-operate irrigation or fertilization equipment.
+This is a decision-support prototype. Recommendations are informational and require human review.
