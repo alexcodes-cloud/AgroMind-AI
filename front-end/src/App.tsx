@@ -127,7 +127,7 @@ function WeatherCard({ weather }: { weather: WeatherSnapshot }) {
         </div>
         <div className="mt-7 grid grid-cols-2 gap-3">
           {values.map((item) => (
-            <div key={item.label} className="rounded-xl border border-white/80 bg-white/75 p-3 backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/65">
+            <div key={item.label} className="rounded-xl border border-slate-200/80 bg-white/80 p-3 shadow-sm backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/65">
               <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400"><span aria-hidden="true">{item.icon}</span>{item.label}</div>
               <p className="mt-2 text-lg font-bold text-slate-900 dark:text-white">{item.value}</p>
             </div>
