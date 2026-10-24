@@ -1,6 +1,10 @@
+
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: "class",
+
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
+
   theme: {
     extend: {
       colors: {
@@ -10,10 +14,12 @@ export default {
         sand: "#f7f4ed",
         amber: "#d99028",
       },
+
       boxShadow: {
         soft: "0 20px 60px rgba(16, 35, 30, 0.10)",
       },
     },
   },
+
   plugins: [],
 };

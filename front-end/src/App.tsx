@@ -54,17 +54,17 @@ function statusLabel(status: DashboardZone["hydration_status"]) {
 
 function statusTone(status: DashboardZone["hydration_status"]) {
   if (status === "investigation_needed")
-    return "border-amber-200 bg-amber-50 text-amber-800";
+    return "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900/30 dark:bg-amber-900/20 dark:text-amber-300";
   if (status === "insufficient_evidence")
-    return "border-slate-200 bg-slate-50 text-slate-600";
-  return "border-emerald-200 bg-emerald-50 text-emerald-800";
+    return "border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-400";
+  return "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/30 dark:bg-emerald-900/20 dark:text-emerald-300";
 }
 
 function riskTone(risk: DashboardZone["hydration_risk"]) {
-  if (risk === "high") return "text-red-700";
-  if (risk === "medium") return "text-amber-700";
-  if (risk === "unknown") return "text-slate-500";
-  return "text-emerald-700";
+  if (risk === "high") return "text-red-700 dark:text-red-400";
+  if (risk === "medium") return "text-amber-700 dark:text-amber-400";
+  if (risk === "unknown") return "text-slate-500 dark:text-slate-400";
+  return "text-emerald-700 dark:text-emerald-400";
 }
 
 function Metric({
@@ -77,62 +77,62 @@ function Metric({
   detail?: string;
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
         {label}
       </p>
-      <p className="mt-2 text-2xl font-bold text-slate-900">{value}</p>
-      {detail && <p className="mt-1 text-sm text-slate-500">{detail}</p>}
+      <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
+      {detail && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{detail}</p>}
     </div>
   );
 }
 
 function WeatherCard({ weather }: { weather: WeatherSnapshot }) {
   const current = weather.current;
+  const rain = current?.precipitation_mm ?? 0;
+  const humidity = current?.relative_humidity_pct ?? null;
+  const condition = rain > 0
+    ? { icon: "🌧️", title: "Rain expected", detail: "Precipitation detected", tone: "from-sky-500/15 via-cyan-500/10 to-transparent" }
+    : humidity != null && humidity >= 75
+      ? { icon: "☁️", title: "Cloudy conditions", detail: "High relative humidity", tone: "from-slate-400/20 via-sky-500/10 to-transparent" }
+      : { icon: "☀️", title: "Mostly sunny", detail: "No precipitation recorded", tone: "from-amber-400/20 via-orange-400/10 to-transparent" };
+
   const values = [
-    [
-      "Temperature",
-      current?.temperature_c == null ? "—" : `${current.temperature_c} °C`,
-    ],
-    [
-      "Humidity",
-      current?.relative_humidity_pct == null
-        ? "—"
-        : `${current.relative_humidity_pct}%`,
-    ],
-    [
-      "Wind",
-      current?.wind_speed_kmh == null ? "—" : `${current.wind_speed_kmh} km/h`,
-    ],
-    [
-      "Rain",
-      current?.precipitation_mm == null
-        ? "—"
-        : `${current.precipitation_mm} mm`,
-    ],
+    { label: "Temperature", value: current?.temperature_c == null ? "—" : `${current.temperature_c}°C`, icon: "🌡️" },
+    { label: "Humidity", value: humidity == null ? "—" : `${humidity}%`, icon: "💧" },
+    { label: "Wind speed", value: current?.wind_speed_kmh == null ? "—" : `${current.wind_speed_kmh} km/h`, icon: "💨" },
+    { label: "Rainfall", value: current?.precipitation_mm == null ? "—" : `${current.precipitation_mm} mm`, icon: "🌧️" },
   ];
+
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
+    <section className="flex h-full min-h-[320px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div className="flex items-start justify-between gap-3 border-b border-slate-100 px-5 py-4 dark:border-slate-800">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Weather snapshot
-          </p>
-          <h2 className="mt-1 text-lg font-semibold text-slate-900">
-            Current field conditions
-          </h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700 dark:text-sky-300">Local weather</p>
+          <h2 className="mt-1 text-xl font-bold text-slate-900 dark:text-white">Field conditions</h2>
         </div>
-        <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
-          {weather.source}
-        </span>
+        <span className="max-w-[45%] truncate rounded-full bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 dark:bg-sky-950/60 dark:text-sky-200" title={weather.source}>{weather.source}</span>
       </div>
-      <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {values.map(([label, value]) => (
-          <div key={label}>
-            <p className="text-xs text-slate-500">{label}</p>
-            <p className="mt-1 font-semibold text-slate-900">{value}</p>
+      <div className={`relative flex flex-1 flex-col justify-between bg-gradient-to-br ${condition.tone} p-5`}>
+        <div className="flex items-center gap-4 sm:gap-5">
+          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border border-white/70 bg-white/70 text-6xl shadow-sm dark:border-slate-700/70 dark:bg-slate-800/70" aria-label={condition.title}>
+            <span role="img" aria-hidden="true">{condition.icon}</span>
           </div>
-        ))}
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Current conditions</p>
+            <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{condition.title}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{condition.detail}</p>
+            <p className="mt-3 text-4xl font-bold tracking-tight text-slate-900 dark:text-white">{current?.temperature_c == null ? "—" : `${current.temperature_c}°`}<span className="ml-1 text-base font-semibold text-slate-500 dark:text-slate-400">C</span></p>
+          </div>
+        </div>
+        <div className="mt-7 grid grid-cols-2 gap-3">
+          {values.map((item) => (
+            <div key={item.label} className="rounded-xl border border-white/80 bg-white/75 p-3 backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/65">
+              <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400"><span aria-hidden="true">{item.icon}</span>{item.label}</div>
+              <p className="mt-2 text-lg font-bold text-slate-900 dark:text-white">{item.value}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -142,34 +142,33 @@ function ZoneTable({ zones }: { zones: DashboardZone[] }) {
   return (
     <section
       id="zones"
-      className="scroll-mt-6 rounded-xl border border-slate-200 bg-white shadow-sm"
+      className="scroll-mt-6 rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
     >
-      <div className="flex flex-col gap-1 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-1 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-700">
         <div>
-          <h2 className="font-semibold text-slate-900">Zone monitoring</h2>
-          <p className="text-sm text-slate-500">
+          <h2 className="font-semibold text-slate-900 dark:text-white">Zone monitoring</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Validated hydration and fertilization signals.
           </p>
         </div>
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-slate-500 dark:text-slate-400">
           {zones.length} zones in this run
         </span>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+          <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-300">
             <tr>
               <th className="px-5 py-3 font-semibold">Zone</th>
               <th className="px-5 py-3 font-semibold">Hydration</th>
               <th className="px-5 py-3 font-semibold">Hydration risk</th>
               <th className="px-5 py-3 font-semibold">Fertilization</th>
-              <th className="px-5 py-3 font-semibold">Updated</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {zones.map((zone) => (
-              <tr key={zone.zone_id} className="hover:bg-slate-50">
-                <td className="whitespace-nowrap px-5 py-4 font-semibold text-slate-900">
+              <tr key={zone.zone_id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                <td className="whitespace-nowrap px-5 py-4 font-semibold text-slate-900 dark:text-white">
                   {zone.zone_id}
                 </td>
                 <td className="px-5 py-4">
@@ -191,11 +190,6 @@ function ZoneTable({ zones }: { zones: DashboardZone[] }) {
                     {statusLabel(zone.fertilization_status)}
                   </span>
                 </td>
-                <td className="whitespace-nowrap px-5 py-4 text-slate-500">
-                  {zone.last_updated_at
-                    ? new Date(zone.last_updated_at).toLocaleString()
-                    : "Not available"}
-                </td>
               </tr>
             ))}
           </tbody>
@@ -209,21 +203,21 @@ function ActionPlan({ actions }: { actions: Priority[] }) {
   return (
     <section
       id="action-plan"
-      className="scroll-mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+      className="scroll-mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="font-semibold text-slate-900">Recommended actions</h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <h2 className="font-semibold text-slate-900 dark:text-white">Recommended actions</h2>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             AI suggestions grounded in the validated zone reports.
           </p>
         </div>
-        <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">
+        <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
           Human review required
         </span>
       </div>
       {actions.length === 0 ? (
-        <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-600">
+        <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm text-slate-600 dark:bg-slate-800 dark:text-slate-300">
           No actions were returned for this analysis run.
         </p>
       ) : (
@@ -231,19 +225,19 @@ function ActionPlan({ actions }: { actions: Priority[] }) {
           {actions.map((item, index) => (
             <li
               key={`${item.zone_id}-${item.domain}-${item.priority}`}
-              className="flex gap-3 rounded-lg border border-slate-100 bg-slate-50 p-4"
+              className="flex gap-3 rounded-lg border border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/70"
             >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
                 {index + 1}
               </span>
               <div className="min-w-0">
-                <p className="font-semibold text-slate-900">
+                <p className="font-semibold text-slate-900 dark:text-white">
                   Zone {item.zone_id} · {item.domain}
                 </p>
-                <p className="mt-1 text-sm text-slate-700">{item.action}</p>
-                <p className="mt-1 text-xs text-slate-500">{item.reason}</p>
+                <p className="mt-1 text-sm text-slate-700 dark:text-slate-200">{item.action}</p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{item.reason}</p>
                 {item.evidence_refs.length > 0 && (
-                  <p className="mt-2 text-xs font-medium text-emerald-700">
+                  <p className="mt-2 text-xs font-medium text-emerald-700 dark:text-emerald-400">
                     Evidence: {item.evidence_refs.join(", ")}
                   </p>
                 )}
@@ -265,36 +259,52 @@ function FarmMap({
 }) {
   type MapSeverity = "critical" | "high" | "medium" | "unknown" | "low";
 
+  const normalize = (value: unknown) => {
+    const raw = String(value ?? "").trim().toLowerCase();
+    const compact = raw.replace(/[^a-z0-9]/g, "");
+    const zoneMatch = compact.match(/^z0*(\d+)$/);
+    if (zoneMatch) return `z${Number(zoneMatch[1])}`;
+    return compact;
+  };
+  const findZone = (zoneId: string) =>
+    zones.find((item) => normalize(item.zone_id) === normalize(zoneId));
+
   const getZoneSeverity = (zoneId: string): MapSeverity => {
-    const zone = zones.find((item) => item.zone_id === zoneId);
+    const zone = findZone(zoneId);
     if (!zone) return "unknown";
 
-    const zoneActions = actions.filter((item) => item.zone_id === zoneId);
-    const hasEvidenceGap =
-      zone.hydration_status === "insufficient_evidence" ||
-      zone.fertilization_status === "insufficient_evidence" ||
-      zone.hydration_risk === "unknown" ||
-      zone.fertilization_risk === "unknown";
+    const zoneActions = actions.filter(
+      (item) => normalize(item.zone_id) === normalize(zoneId),
+    );
 
-    // A documented urgent action takes precedence over the risk colors.
+    const risks = [normalize(zone.hydration_risk), normalize(zone.fertilization_risk)];
+    const riskSeverity: MapSeverity = risks.includes("high")
+      ? "high"
+      : risks.includes("medium")
+        ? "medium"
+        : "low";
+
+    const hasEvidenceGap =
+      normalize(zone.hydration_status) === "insufficient_evidence" ||
+      normalize(zone.fertilization_status) === "insufficient_evidence" ||
+      risks.includes("unknown");
+
     const priorityValues = zoneActions.map((item) => {
-      const raw = String(item.priority ?? "").toLowerCase();
-      if (raw.includes("critical")) return 4;
+      const raw = normalize(item.priority);
+      if (raw.includes("critical") || raw === "urgent") return 4;
       if (raw.includes("high")) return 3;
       if (raw.includes("medium")) return 2;
       if (raw.includes("low")) return 1;
       const numeric = Number(raw);
-      // In the API contract, smaller numeric values mean higher priority.
-      return Number.isFinite(numeric) && numeric > 0 ? Math.max(1, 5 - numeric) : 0;
+      return Number.isFinite(numeric) && numeric > 0
+        ? Math.max(1, 5 - numeric)
+        : 0;
     });
     const actionSeverity = Math.max(0, ...priorityValues);
-    if (actionSeverity >= 4) return "critical";
-    if (actionSeverity === 3) return "high";
-    if (actionSeverity === 2) return "medium";
 
-    const risks = [zone.hydration_risk, zone.fertilization_risk];
-    if (risks.includes("high")) return "high";
-    if (risks.includes("medium")) return "medium";
+    if (actionSeverity >= 4) return "critical";
+    if (riskSeverity === "high" || actionSeverity === 3) return "high";
+    if (riskSeverity === "medium" || actionSeverity === 2) return "medium";
     if (hasEvidenceGap) return "unknown";
     return "low";
   };
@@ -307,8 +317,6 @@ function FarmMap({
     low: { fill: "rgba(16, 185, 129, 0.27)", stroke: "#059669", label: "Low risk / normal" },
   };
 
-  // Approximate field-parcel boundaries traced against the supplied 790 × 513 image.
-  // These are visual demo polygons, not surveyed/GIS boundaries.
   const parcels: Array<{ id: string; points: string; label: [number, number] }> = [
     { id: "Z-1", points: "0,0 171,0 184,40 198,100 220,164 246,204 211,211 192,197 174,185 151,185 130,194 103,201 58,204 24,204 0,201", label: [94, 150] },
     { id: "Z-2", points: "171,0 250,0 310,0 389,0 426,119 389,130 350,151 310,211 248,212 246,204 220,164 198,100 184,40", label: [300, 75] },
@@ -325,13 +333,13 @@ function FarmMap({
   ];
 
   return (
-    <section className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-200 px-5 py-4">
-        <h2 className="font-semibold text-slate-900">Satellite Zone Map</h2>
-        <p className="text-sm text-slate-500">
+    <section className="h-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+        <h2 className="font-semibold text-slate-900 dark:text-white">Satellite Zone Map</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           12-zone overlay colored from hydration risk, fertilization risk, evidence quality, and action priority
         </p>
-        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-600">
+        <div className="mt-3 flex flex-wrap gap-x-3 gap-y-2 text-xs text-slate-600 dark:text-slate-300">
           {(["critical", "high", "medium", "unknown", "low"] as MapSeverity[]).map((severity) => (
             <span key={severity} className="inline-flex items-center gap-1.5">
               <span className="h-3 w-3 rounded-sm border" style={{ backgroundColor: severityStyles[severity].fill, borderColor: severityStyles[severity].stroke }} />
@@ -341,7 +349,7 @@ function FarmMap({
         </div>
       </div>
 
-      <div className="relative w-full bg-slate-100">
+      <div className="relative w-full bg-slate-100 dark:bg-slate-900">
         <img
           src="https://s3-eu-west-1.amazonaws.com/ifj/WEBFILES/000/378/780/1041580-378780.jpg"
           alt="Farm satellite view"
@@ -356,7 +364,7 @@ function FarmMap({
           {parcels.map((parcel) => {
             const severity = getZoneSeverity(parcel.id);
             const style = severityStyles[severity];
-            const zone = zones.find((item) => item.zone_id === parcel.id);
+            const zone = findZone(parcel.id);
             const title = zone
               ? `${parcel.id}: ${style.label}; hydration ${zone.hydration_risk}; fertilization ${zone.fertilization_risk}`
               : `${parcel.id}: no current zone data`;
@@ -406,7 +414,7 @@ function LoadingScreen({ darkMode, completedSteps }: { darkMode: boolean; comple
   const progress = Math.min(96, 8 + Math.round((completed / steps.length) * 84));
 
   return (
-    <div className={`${darkMode ? "dark" : ""} ag-loading min-h-screen overflow-hidden bg-slate-50 text-slate-800`}>
+    <div className={`${darkMode ? "dark" : ""} ag-loading min-h-screen overflow-hidden bg-slate-50 text-slate-800 dark:bg-[#0b1512] dark:text-slate-100`}>
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl items-center px-5 py-12 lg:px-8">
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
           <div className="ag-glow ag-glow-one" />
@@ -416,7 +424,7 @@ function LoadingScreen({ darkMode, completedSteps }: { darkMode: boolean; comple
 
         <div className="relative grid w-full items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="mx-auto w-full max-w-xl lg:mx-0">
-            <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-emerald-200 bg-white/80 px-4 py-2 shadow-sm backdrop-blur dark:border-emerald-900 dark:bg-slate-900/80">
+            <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-emerald-200 bg-white/80 px-4 py-2 shadow-sm backdrop-blur dark:border-emerald-900/50 dark:bg-slate-900/80">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-700 text-xl text-white">✦</span>
               <span>
                 <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-white">AgroMind <span className="text-emerald-600">AI</span></span>
@@ -448,12 +456,12 @@ function LoadingScreen({ darkMode, completedSteps }: { darkMode: boolean; comple
               <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">Currently: <span className="font-semibold text-slate-700 dark:text-slate-200">{completed === steps.length ? "Finalizing dashboard" : "Waiting for data sources"}</span></p>
 
               <div className="mt-6 space-y-3">
-                {steps.map((step, index) => {
+                {steps.map((step) => {
                   const done = completedSteps.includes(step.id);
                   const active = !done;
                   return (
-                    <div key={step.id} className={`flex items-center gap-3 rounded-xl border p-3 transition-colors ${done ? "border-emerald-100 bg-emerald-50/80 dark:border-emerald-900/70 dark:bg-emerald-950/30" : active ? "border-emerald-200 bg-emerald-50/50 dark:border-emerald-800 dark:bg-emerald-950/20" : "border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-800/40"}`}>
-                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg ${done ? "bg-emerald-600 text-white" : active ? "bg-white text-emerald-700 shadow-sm dark:bg-slate-800 dark:text-emerald-300" : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"}`}>
+                    <div key={step.id} className={`flex items-center gap-3 rounded-xl border p-3 transition-colors ${done ? "border-emerald-100 bg-emerald-50/80 dark:border-emerald-900/40 dark:bg-emerald-950/40" : active ? "border-emerald-200 bg-emerald-50/50 dark:border-emerald-800/60 dark:bg-emerald-950/20" : "border-slate-100 bg-slate-50/80 dark:border-slate-800/60 dark:bg-slate-800/40"}`}>
+                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg ${done ? "bg-emerald-600 text-white dark:bg-emerald-700" : active ? "bg-white text-emerald-700 shadow-sm dark:bg-slate-800 dark:text-emerald-300" : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"}`}>
                         {done ? "✓" : active ? <span className="ag-step-pulse">{step.icon}</span> : step.icon}
                       </span>
                       <span className="min-w-0 flex-1">
@@ -516,6 +524,13 @@ function App() {
       window.localStorage.setItem("agromind.theme", darkMode ? "dark" : "light");
     } catch {
       // Theme persistence is optional.
+    }
+
+    // Fix: Ensure the document element itself updates for background colors
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
     }
   }, [darkMode]);
 
@@ -601,14 +616,15 @@ function App() {
   );
 
   if (loading) return <LoadingScreen darkMode={darkMode} completedSteps={completedSteps} />;
+
   if (!farm || !weather || !dashboard)
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-6">
-        <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-7 text-center shadow-sm">
-          <h1 className="text-xl font-bold text-slate-900">
+      <div className={`${darkMode ? "dark" : ""} flex min-h-screen items-center justify-center bg-slate-50 dark:bg-[#0b1512] px-6`}>
+        <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-7 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">
             Dashboard unavailable
           </h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
+          <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
             {error ?? "The backend did not return a complete response."}
           </p>
           <button
@@ -623,22 +639,22 @@ function App() {
     );
 
   return (
-    <div className={`${darkMode ? "dark" : ""} min-h-screen bg-slate-50 text-slate-800 transition-colors duration-200`}>
-      <header className="border-b border-slate-200 bg-white">
+    <div className={`${darkMode ? "dark" : ""} min-h-screen bg-[#f5f8f4] text-slate-800 transition-colors duration-200 dark:bg-[#0b1512] dark:text-slate-100`}>
+      <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 lg:px-8">
           <a
             href="#top"
             className="flex items-center gap-3"
             aria-label="AgroMind dashboard home"
           >
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-700 text-xl text-white">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-700 text-xl text-white dark:bg-emerald-600">
               ✦
             </span>
             <span>
-              <span className="block text-lg font-bold tracking-tight text-slate-900">
-                AgroMind <span className="text-emerald-700">AI</span>
+              <span className="block text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                AgroMind <span className="text-emerald-700 dark:text-emerald-400">AI</span>
               </span>
-              <span className="block text-xs text-slate-500">
+              <span className="block text-xs text-slate-500 dark:text-slate-400">
                 Farm intelligence demo
               </span>
             </span>
@@ -655,7 +671,7 @@ function App() {
               <span className="hidden sm:inline">{darkMode ? "Light mode" : "Dark mode"}</span>
             </button>
             <span
-              className={`hidden rounded-full px-3 py-1.5 text-xs font-semibold sm:inline-flex ${FALLBACK_ENABLED ? "bg-amber-50 text-amber-800" : "bg-emerald-50 text-emerald-800"}`}
+              className={`hidden rounded-full px-3 py-1.5 text-xs font-semibold sm:inline-flex ${FALLBACK_ENABLED ? "bg-amber-50 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300" : "bg-emerald-50 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"}`}
             >
               {FALLBACK_ENABLED ? "Demo fallback" : "Gemini AI active"}
             </span>
@@ -663,37 +679,37 @@ function App() {
               type="button"
               disabled={refreshing}
               onClick={() => void load(true)}
-              className="rounded-lg border border-emerald-700 px-3 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50 disabled:cursor-wait disabled:opacity-60"
+              className="rounded-lg border border-emerald-700 px-3 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50 disabled:cursor-wait disabled:opacity-60 dark:border-emerald-500 dark:text-emerald-300 dark:hover:bg-emerald-950/60"
             >
               {refreshing ? "Analyzing…" : "Refresh analysis"}
             </button>
           </div>
         </div>
         <nav
-          className="border-t border-slate-100 bg-slate-50"
+          className="border-t border-slate-100 bg-slate-50 dark:border-slate-800/80 dark:bg-slate-950"
           aria-label="Dashboard sections"
         >
-          <div className="mx-auto flex max-w-7xl gap-5 overflow-x-auto px-5 py-2 text-sm text-slate-600 lg:px-8">
+          <div className="mx-auto flex max-w-7xl gap-5 overflow-x-auto px-5 py-2 text-sm text-slate-600 dark:text-slate-400 lg:px-8">
             <a
-              className="whitespace-nowrap hover:text-emerald-700"
+              className="whitespace-nowrap hover:text-emerald-700 dark:hover:text-emerald-300"
               href="#overview"
             >
               Overview
             </a>
             <a
-              className="whitespace-nowrap hover:text-emerald-700"
+              className="whitespace-nowrap hover:text-emerald-700 dark:hover:text-emerald-300"
               href="#zones"
             >
               Zones
             </a>
             <a
-              className="whitespace-nowrap hover:text-emerald-700"
+              className="whitespace-nowrap hover:text-emerald-700 dark:hover:text-emerald-300"
               href="#action-plan"
             >
               Action plan
             </a>
             <a
-              className="whitespace-nowrap hover:text-emerald-700"
+              className="whitespace-nowrap hover:text-emerald-700 dark:hover:text-emerald-300"
               href="#weather"
             >
               Weather
@@ -707,23 +723,26 @@ function App() {
           className="flex flex-col justify-between gap-3 scroll-mt-6 sm:flex-row sm:items-end"
         >
           <div>
-            <p className="text-sm font-semibold text-emerald-700">
+            <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
               Farm overview
             </p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900">
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
               {farm.farm_name}
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Run {dashboard.analysis_run_id} · {farm.location.timezone}
             </p>
           </div>
-          <span className="w-fit rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-800">
+          <span className="w-fit rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
             ● {dashboard.status}
           </span>
         </section>
-        <FarmMap zones={dashboard.zones} actions={dashboard.action_plan} />
+        <section id="weather" className="scroll-mt-6 grid items-stretch gap-5 lg:grid-cols-2">
+          <FarmMap zones={dashboard.zones} actions={dashboard.action_plan} />
+          <WeatherCard weather={weather} />
+        </section>
         {usingCache && (
-          <div className="flex flex-col justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 sm:flex-row sm:items-center">
+          <div className="flex flex-col justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 sm:flex-row sm:items-center dark:border-emerald-900/30 dark:bg-emerald-900/20 dark:text-emerald-300">
             <span>
               Showing the last validated result. Refreshing the page will not
               start another AI run.
@@ -738,17 +757,17 @@ function App() {
           </div>
         )}
         {notice && (
-          <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+          <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
             {notice}
           </div>
         )}
         {error && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/30 dark:bg-amber-900/20 dark:text-amber-300">
             {error} The previous validated dashboard remains visible.
           </div>
         )}
         {FALLBACK_ENABLED && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/30 dark:bg-amber-900/20 dark:text-amber-300">
             <strong>Demo fallback is active.</strong> These results are not
             AI-generated.
           </div>
@@ -775,12 +794,9 @@ function App() {
             detail="Based on this analysis run"
           />
         </section>
-        <div id="weather" className="scroll-mt-6">
-          <WeatherCard weather={weather} />
-        </div>
         <ZoneTable zones={dashboard.zones} />
         <ActionPlan actions={dashboard.action_plan} />
-        <footer className="pb-4 text-center text-xs text-slate-500">
+        <footer className="pb-4 text-center text-xs text-slate-500 dark:text-slate-400">
           Evidence IDs are preserved · Recommendations require human approval ·
           Last updated from {dashboard.status} run
         </footer>
