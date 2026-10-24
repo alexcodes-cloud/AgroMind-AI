@@ -8,7 +8,11 @@ from typing import Any, Protocol
 from ai.demo_plan_adapter import adapt_demo_farm_plan
 from ai.farm_plan import FarmPlan, FarmPlanValidationError, validate_farm_plan
 from ai.gemini_provider import ProviderError
-from ai.local_demo_fallback import FALLBACK_LIMITATION, build_local_farm_plan
+from ai.local_demo_fallback import (
+    FALLBACK_LIMITATION,
+    build_deterministic_farm_plan,
+    build_local_farm_plan,
+)
 from ai.stage1_analyzer import Stage1RunResult
 from ai.stage2_prompt import PromptSafetyError, build_stage2_prompt
 
@@ -50,6 +54,11 @@ class Stage2Analyzer:
             raise Stage2AnalysisError("Stage 1 reports belong to a different farm")
         if self.demo_fallback:
             return build_local_farm_plan(stage1_result)
+        if getattr(self.provider, "uses_compact_zone_analysis", False):
+            # Stage 1 already contains the bounded AI interpretation. The
+            # action plan is a deterministic, traceable projection of those
+            # validated findings; another large Gemini response is redundant.
+            return build_deterministic_farm_plan(stage1_result)
 
         validation_feedback: str | None = None
         for attempt in range(MAX_VALIDATION_RETRIES + 1):

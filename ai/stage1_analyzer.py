@@ -14,7 +14,12 @@ from ai.gemini_provider import (
     ProviderError,
     ProviderUpstreamError,
 )
-from ai.stage1_prompt import PromptSafetyError, build_stage1_prompt
+from ai.stage1_prompt import (
+    PromptSafetyError,
+    build_compact_stage1_prompt,
+    build_stage1_prompt,
+)
+from ai.zone_insight import merge_compact_zone_insights
 from ai.zone_report import ZoneReport, ZoneReportValidationError, validate_zone_report
 
 
@@ -98,6 +103,7 @@ class Stage1Analyzer:
         batch: dict[str, Any],
         prompt: str,
         batch_id: str,
+        validation_feedback: str | None = None,
     ) -> tuple[dict[str, Any], bool]:
         if self.demo_fallback:
             LOGGER.warning(
@@ -108,6 +114,15 @@ class Stage1Analyzer:
 
         for provider_attempt in range(MAX_BATCH_PROVIDER_RETRIES + 1):
             try:
+                if getattr(self.provider, "uses_compact_zone_analysis", False):
+                    compact_prompt = build_compact_stage1_prompt(
+                        batch,
+                        validation_feedback=validation_feedback,
+                    )
+                    compact = self.provider.generate_zone_insights(compact_prompt)  # type: ignore[attr-defined]
+                    return merge_compact_zone_insights(
+                        build_local_zone_report(batch), compact, batch
+                    ), False
                 return self.provider.generate_zone_report(prompt), False
             except ProviderUpstreamError as exc:
                 # The provider already retries deadline errors. A second
@@ -164,7 +179,7 @@ class Stage1Analyzer:
                         validation_feedback=validation_feedback,
                     )
                     raw_report, used_fallback = self._generate_zone_report(
-                        batch, prompt, batch_id
+                        batch, prompt, batch_id, validation_feedback
                     )
                     fallback_used = fallback_used or used_fallback
                     if self.demo_mode:

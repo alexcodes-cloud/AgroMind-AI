@@ -26,7 +26,11 @@ from ai.gemini_provider import (
     _response_text,
 )
 from ai.stage1_analyzer import Stage1Analyzer
-from ai.stage1_prompt import PromptSafetyError, build_stage1_prompt
+from ai.stage1_prompt import (
+    PromptSafetyError,
+    build_compact_stage1_prompt,
+    build_stage1_prompt,
+)
 from ai.zone_report import ZoneReportValidationError, validate_zone_report
 
 
@@ -114,6 +118,33 @@ class RaisingZoneProvider:
         raise self.error
 
 
+class CompactZoneProvider:
+    uses_compact_zone_analysis = True
+
+    def __init__(self):
+        self.prompts = []
+
+    def generate_zone_insights(self, prompt):
+        self.prompts.append(prompt)
+        observations = json.loads(
+            prompt.split("OBSERVATIONS\n", 1)[1].split("\nEND OBSERVATIONS", 1)[0]
+        )
+        return {
+            "insights": [
+                {
+                    "zone_id": zone["zone_id"],
+                    "hydration_status": "investigation_needed",
+                    "hydration_risk": "high",
+                    "fertilization_status": "normal",
+                    "fertilization_risk": "low",
+                    "hydration_summary": "The moisture signal needs review.",
+                    "fertilization_summary": "The nutrient signal does not require immediate review.",
+                }
+                for zone in observations["zones"]
+            ]
+        }
+
+
 class RetryOnceZoneProvider:
     def __init__(self):
         self.prompts = []
@@ -165,6 +196,25 @@ class Stage1Tests(unittest.TestCase):
         ])
         self.assertEqual(len(provider.prompts), 3)
         self.assertTrue(all("evaluation_labels" not in prompt for prompt in provider.prompts))
+
+    def test_compact_provider_merges_ai_signals_into_deterministic_contract(self):
+        provider = CompactZoneProvider()
+        analyzer = Stage1Analyzer(provider, schema_path=SCHEMA_PATH, batch_size=4)
+        result = analyzer.analyze(self.farm, self.weather, analysis_run_id="compact_test")
+        assessment = result.batches[0].report.assessments[0]
+        self.assertEqual(assessment.hydration.status, "investigation_needed")
+        self.assertEqual(assessment.hydration.risk_level, "high")
+        self.assertTrue(assessment.hydration.evidence)
+        self.assertTrue(provider.prompts)
+
+    def test_compact_prompt_requests_only_small_interpretations(self):
+        batch = build_stage1_batches(self.farm, self.weather, batch_size=4, analysis_run_id="compact_prompt")[0]
+        prompt = build_compact_stage1_prompt(batch)
+        self.assertIn("hydration_summary", prompt)
+        self.assertIn("backend\nbuilds the full traceable report", prompt)
+        self.assertNotIn("complete report", prompt.lower())
+        self.assertNotIn(batch["zones"][0]["sensors"][0]["record_id"], prompt)
+        self.assertLess(len(prompt), 1800)
 
     def test_pipeline_retries_schema_invalid_report_with_feedback(self):
         provider = RetryOnceZoneProvider()
@@ -366,10 +416,10 @@ class Stage1Tests(unittest.TestCase):
         ]
         provider = GeminiProvider(make_settings(), client=client)
         with patch("ai.gemini_provider.time.sleep") as sleep:
-            response = provider.generate_content_response("prompt")
-        self.assertEqual(response.text, '{"schema_version":"1.0"}')
-        self.assertEqual(client.models.generate_content.call_count, 2)
-        sleep.assert_called_once_with(0.5)
+            with self.assertRaises(ProviderTimeoutError):
+                provider.generate_content_response("prompt")
+        client.models.generate_content.assert_called_once()
+        sleep.assert_not_called()
 
         client = MagicMock()
         client.models.generate_content.side_effect = MockSdkError(
