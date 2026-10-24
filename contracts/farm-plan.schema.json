@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agromind.example/contracts/farm-plan.schema.json",
+  "title": "AgroMind Stage 2 Farm Action Plan",
+  "description": "Farm-wide prioritized plan synthesized from validated zone reports.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "farm_id",
+    "analysis_run_id",
+    "summary",
+    "priorities",
+    "farm_wide_considerations",
+    "unresolved_questions",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "farm_id": {
+      "type": "string"
+    },
+    "analysis_run_id": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "priorities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "priority",
+          "zone_id",
+          "domain",
+          "action",
+          "reason",
+          "evidence_refs",
+          "uncertainty",
+          "requires_human_approval"
+        ],
+        "properties": {
+          "priority": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "zone_id": {
+            "type": "string"
+          },
+          "domain": {
+            "enum": [
+              "hydration",
+              "fertilization"
+            ]
+          },
+          "action": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "uncertainty": {
+            "type": "string"
+          },
+          "requires_human_approval": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "farm_wide_considerations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unresolved_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

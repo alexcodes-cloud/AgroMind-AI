@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agromind.example/contracts/zone-report.schema.json",
+  "title": "AgroMind Stage 1 Zone Batch Report",
+  "description": "Validated structure expected from Gemma's zone-analysis stage.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "farm_id",
+    "batch_id",
+    "assessments"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "farm_id": {
+      "type": "string"
+    },
+    "batch_id": {
+      "type": "string"
+    },
+    "assessments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "zone_id",
+          "hydration",
+          "fertilization"
+        ],
+        "properties": {
+          "zone_id": {
+            "type": "string"
+          },
+          "hydration": {
+            "$ref": "#/$defs/domainAssessment"
+          },
+          "fertilization": {
+            "$ref": "#/$defs/domainAssessment"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "domainAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "risk_level",
+        "confidence",
+        "finding",
+        "evidence",
+        "missing_information",
+        "recommended_actions"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "normal",
+            "investigation_needed",
+            "insufficient_evidence"
+          ]
+        },
+        "risk_level": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "unknown"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "low",
+            "moderate",
+            "high"
+          ]
+        },
+        "finding": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "record_id",
+              "interpretation"
+            ],
+            "properties": {
+              "record_id": {
+                "type": "string"
+              },
+              "interpretation": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "missing_information": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "recommended_actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "action",
+              "description",
+              "requires_human_approval"
+            ],
+            "properties": {
+              "action": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "requires_human_approval": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

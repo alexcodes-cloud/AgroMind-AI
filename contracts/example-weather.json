@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "farm_id": "farm_001",
+  "source": "Open-Meteo",
+  "retrieved_at": "2026-10-24T10:00:00Z",
+  "location": {
+    "latitude": 33.97,
+    "longitude": -6.87,
+    "timezone": "Africa/Casablanca"
+  },
+  "current": {
+    "temperature_c": 29,
+    "relative_humidity_pct": 48,
+    "wind_speed_kmh": 12,
+    "precipitation_mm": 0,
+    "et0_mm": null,
+    "valid_at": "2026-10-24T10:00:00Z"
+  },
+  "forecast": [
+    {
+      "time": "2026-10-24T14:00:00Z",
+      "temperature_c": 32,
+      "relative_humidity_pct": null,
+      "wind_speed_kmh": null,
+      "precipitation_mm": 0.5,
+      "et0_mm": null
+    }
+  ]
+}

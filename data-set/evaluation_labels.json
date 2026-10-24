@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0",
+  "farm_id": "farm_001",
+  "seed": 42,
+  "warning": "Ground-truth labels only. Do not include this file in model prompts.",
+  "zones": [
+    {
+      "zone_id": "Z01",
+      "scenario_label": "healthy",
+      "expected_hydration": "normal",
+      "expected_fertilization": "normal",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    },
+    {
+      "zone_id": "Z02",
+      "scenario_label": "water_stress",
+      "expected_hydration": "investigation_needed",
+      "expected_fertilization": "normal",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    },
+    {
+      "zone_id": "Z03",
+      "scenario_label": "possible_nutrient_deficiency",
+      "expected_hydration": "normal",
+      "expected_fertilization": "investigation_needed",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    },
+    {
+      "zone_id": "Z04",
+      "scenario_label": "mixed_water_and_nutrient_risk",
+      "expected_hydration": "investigation_needed",
+      "expected_fertilization": "investigation_needed",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    },
+    {
+      "zone_id": "Z05",
+      "scenario_label": "uncertain_missing_data",
+      "expected_hydration": "insufficient_evidence",
+      "expected_fertilization": "insufficient_evidence",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    },
+    {
+      "zone_id": "Z06",
+      "scenario_label": "sensor_quality_issue",
+      "expected_hydration": "insufficient_evidence",
+      "expected_fertilization": "normal",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    },
+    {
+      "zone_id": "Z07",
+      "scenario_label": "healthy",
+      "expected_hydration": "normal",
+      "expected_fertilization": "normal",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    },
+    {
+      "zone_id": "Z08",
+      "scenario_label": "water_stress",
+      "expected_hydration": "investigation_needed",
+      "expected_fertilization": "normal",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    },
+    {
+      "zone_id": "Z09",
+      "scenario_label": "possible_nutrient_deficiency",
+      "expected_hydration": "normal",
+      "expected_fertilization": "investigation_needed",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    },
+    {
+      "zone_id": "Z10",
+      "scenario_label": "healthy",
+      "expected_hydration": "normal",
+      "expected_fertilization": "normal",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    },
+    {
+      "zone_id": "Z11",
+      "scenario_label": "mixed_water_and_nutrient_risk",
+      "expected_hydration": "investigation_needed",
+      "expected_fertilization": "investigation_needed",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    },
+    {
+      "zone_id": "Z12",
+      "scenario_label": "uncertain_missing_data",
+      "expected_hydration": "insufficient_evidence",
+      "expected_fertilization": "insufficient_evidence",
+      "evaluation_note": "Hidden synthetic label for offline testing only; never send to AI."
+    }
+  ]
+}

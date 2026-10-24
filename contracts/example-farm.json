@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "farm_id": "farm_001",
+  "farm_name": "UM6P Demo Farm",
+  "location": {
+    "latitude": 33.97,
+    "longitude": -6.87,
+    "timezone": "Africa/Casablanca"
+  },
+  "crop_defaults": {
+    "type": "tomato",
+    "variety": null,
+    "growth_stage": "fruit_development",
+    "soil_type": "loam"
+  },
+  "zones": [
+    {
+      "zone_id": "Z01",
+      "area_ha": 4.2,
+      "polygon_geojson": null,
+      "crop": {
+        "type": "tomato",
+        "variety": null,
+        "growth_stage": "fruit_development",
+        "soil_type": "loam"
+      },
+      "sensors": [
+        {
+          "record_id": "sensor_Z01_001",
+          "sensor_id": "sensor_01",
+          "field": "soil_moisture",
+          "value": 18,
+          "unit": "percent_vwc",
+          "depth_cm": 20,
+          "measured_at": "2026-10-24T09:55:00Z",
+          "quality": "valid",
+          "notes": "Synthetic example"
+        }
+      ],
+      "drone_observations": [
+        {
+          "record_id": "drone_Z01_001",
+          "observation": "possible_wilting",
+          "source_type": "simulated",
+          "image_ref": null,
+          "confidence": null,
+          "observed_at": "2026-10-24T09:40:00Z"
+        }
+      ],
+      "management_history": {
+        "last_irrigation_at": null,
+        "last_fertilization_at": null,
+        "notes": null
+      }
+    }
+  ]
+}

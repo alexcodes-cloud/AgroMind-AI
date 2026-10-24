@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agromind.example/contracts/dashboard-response.schema.json",
+  "title": "AgroMind Dashboard API Response",
+  "description": "Stable response consumed by the frontend.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "farm_id",
+    "analysis_run_id",
+    "status",
+    "summary",
+    "zones",
+    "action_plan"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "farm_id": {
+      "type": "string"
+    },
+    "analysis_run_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "processing",
+        "completed",
+        "partial",
+        "failed"
+      ]
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_area_ha",
+        "zones_total",
+        "zones_analyzed",
+        "zones_needing_attention"
+      ],
+      "properties": {
+        "total_area_ha": {
+          "type": "number",
+          "minimum": 0
+        },
+        "zones_total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "zones_analyzed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "zones_needing_attention": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "zones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "zone_id",
+          "hydration_status",
+          "hydration_risk",
+          "fertilization_status",
+          "fertilization_risk"
+        ],
+        "properties": {
+          "zone_id": {
+            "type": "string"
+          },
+          "hydration_status": {
+            "enum": [
+              "normal",
+              "investigation_needed",
+              "insufficient_evidence"
+            ]
+          },
+          "hydration_risk": {
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "unknown"
+            ]
+          },
+          "fertilization_status": {
+            "enum": [
+              "normal",
+              "investigation_needed",
+              "insufficient_evidence"
+            ]
+          },
+          "fertilization_risk": {
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "unknown"
+            ]
+          },
+          "last_updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "action_plan": {
+      "$ref": "farm-plan.schema.json#/properties/priorities"
+    },
+    "error": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
