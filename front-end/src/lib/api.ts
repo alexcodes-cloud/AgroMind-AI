@@ -32,6 +32,9 @@ export function fetchWeather(): Promise<WeatherSnapshot> {
 export function fetchDashboard(analysisRunId: string): Promise<DashboardResponse> {
   return request<DashboardResponse>("/api/v1/dashboard", {
     method: "POST",
-    body: JSON.stringify({ analysis_run_id: analysisRunId, batch_size: 4 }),
+    // Let the backend's AGROMIND_BATCH_SIZE setting control how the farm is
+    // split into provider requests. This keeps the frontend from accidentally
+    // overriding a safer, smaller production batch size.
+    body: JSON.stringify({ analysis_run_id: analysisRunId }),
   });
 }
