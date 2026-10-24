@@ -27,6 +27,20 @@ AgroMind AI analyzes farm zones, checks the evidence, and creates a prioritized 
 - Weather context and a dashboard for exploring results
 - Structured output validation and separation of evaluation labels from AI inputs
 
+## 🎬 Project Demo
+
+Experience AgroSupervisor AI in action! Watch our cinematic demo to see how our platform combines farm-zone monitoring, weather intelligence, and AI-powered agricultural recommendations.
+
+<p align="center">
+  <video src="assets/agrosupervisor-demo.mp4" controls width="100%">
+    Your browser does not support embedded videos.
+  </video>
+</p>
+
+<p align="center">
+  <strong>🌱 Smarter Farming. Better Decisions.</strong>
+</p>
+
 ## 🧠 How it works
 
 ```mermaid
